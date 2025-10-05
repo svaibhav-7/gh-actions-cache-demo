@@ -1,0 +1,40 @@
+name: Python Dependency Cache Demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # ------------------------
+      # Step: Prime Cache
+      # ------------------------
+      - name: prime-cache-3821d88
+        uses: actions/cache@v4
+        id: cache-deps
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.local/lib/python3.11/site-packages
+          key: cache-3821d88
+          restore-keys: cache-3821d88
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Echo cache result
+        run: |
+          echo "Cache hit: ${{ steps.cache-deps.outputs.cache-hit }}"
